@@ -1,0 +1,77 @@
+/* 主窗口样式 */
+QMainWindow {
+    background-color: #2b2b2b;
+}
+
+/* 标签样式 */
+QLabel {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+QLabel#title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4a9eff;
+    padding: 10px;
+}
+
+/* 按钮样式 */
+QPushButton {
+    background-color: #0d47a1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+QPushButton:hover {
+    background-color: #1565c0;
+}
+
+QPushButton:pressed {
+    background-color: #0a3d91;
+}
+
+QPushButton:disabled {
+    background-color: #666666;
+}
+
+/* 表格样式 */
+QTableWidget {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    gridline-color: #3d3d3d;
+    border: 1px solid #3d3d3d;
+    border-radius: 4px;
+}
+
+QTableWidget::item {
+    padding: 5px;
+}
+
+QTableWidget::item:selected {
+    background-color: #0d47a1;
+}
+
+QHeaderView::section {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    padding: 5px;
+    border: 1px solid #3d3d3d;
+}
+
+/* 进度条样式 */
+QProgressBar {
+    border: 1px solid #3d3d3d;
+    border-radius: 3px;
+    text-align: center;
+    background-color: #1e1e1e;
+}
+
+QProgressBar::chunk {
+    background-color: #0d47a1;
+    width: 10px;
+} 

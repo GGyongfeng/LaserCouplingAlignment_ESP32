@@ -1,0 +1,14 @@
+# 忽略 docs、back、tests 文件夹
+/docs/
+/back/
+/tests/
+
+# 忽略 firmware 目录下除 project_main_v2.0 外的所有文件夹
+/firmware/*/
+!/firmware/project_main_v2.0/
+
+# 忽略所有 node_modules 文件夹（包括子目录下的）
+**/node_modules/
+
+# 忽略所有 .vscode 文件夹（包括子目录下的）
+**/.vscode/ 

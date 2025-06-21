@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>激光对准测量系统</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="control-bar">
+            <input type="text" id="ipAddress1" placeholder="设备1 IP" value="192.168.1.10">
+            <input type="text" id="ipAddress2" placeholder="设备2 IP" value="192.168.1.11" class="dual-only">
+            <select id="workMode" onchange="toggleWorkMode()">
+                <option value="dual">双设备协同</option>
+                <option value="single">单设备模式</option>
+            </select>
+            <button onclick="startMeasurement()">开始测量</button>
+        </div>
+
+        <div id="sensor1Status" class="status"></div>
+        <div id="sensor2Status" class="status dual-only"></div>
+        
+        <canvas id="dataChart" width="400" height="200"></canvas>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="clearData()">数据清零</button>
+            <button onclick="exportData()">导出数据</button>
+        </div>
+    </div>
+
+<script>
+    let measurementData = [];
+    let chart = null;
+    let currentMode = 'dual';
+
+    // 从localStorage加载IP地址
+    window.onload = function() {
+        const savedIp1 = localStorage.getItem('ipAddress1');
+        const savedIp2 = localStorage.getItem('ipAddress2');
+        if (savedIp1) document.getElementById('ipAddress1').value = savedIp1;
+        if (savedIp2) document.getElementById('ipAddress2').value = savedIp2;
+        initChart();
+    };
+
+    // 保存IP地址到localStorage
+    function saveIpAddresses() {
+        const ip1 = document.getElementById('ipAddress1').value;
+        const ip2 = document.getElementById('ipAddress2').value;
+        localStorage.setItem('ipAddress1', ip1);
+        localStorage.setItem('ipAddress2', ip2);
+    }
+
+    // 模式切换处理
+    function toggleWorkMode() {
+        currentMode = document.getElementById('workMode').value;
+        document.body.className = currentMode + '-mode';
+        clearData();
+        initChart();
+    }
+
+    // 初始化图表（根据模式）
+    function initChart() {
+        const ctx = document.getElementById('dataChart').getContext('2d');
+        if(chart) chart.destroy();
+
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: '轴向传感器',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: []
+                }, ...(currentMode === 'dual' ? [{
+                    label: '镜像传感器',
+                    borderColor: 'rgb(54, 162, 235)',
+                    data: [],
+                    hidden: false
+                }] : [])]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'second' }
+                    }
+                }
+            }
+        });
+    }
+
+    // 修改后的测量请求
+    async function startMeasurement() {
+        const ip1 = document.getElementById('ipAddress1').value;
+        const ip2 = document.getElementById('ipAddress2').value;
+        saveIpAddresses();
+
+        try {
+            const response1 = await fetch(`http://${ip1}/any`);
+            const data1 = await response1.json();
+            
+            let data = { sensor1: data1.sensor1 };
+            
+            if (currentMode === 'dual') {
+                const response2 = await fetch(`http://${ip2}/any`);
+                const data2 = await response2.json();
+                data.sensor2 = data2.sensor1;
+            }
+            
+            processSensorData('sensor1', data.sensor1);
+            if(currentMode === 'dual') processSensorData('sensor2', data.sensor2);
+
+            const timestamp = new Date();
+            measurementData.push({
+                timestamp,
+                sensor1: data.sensor1,
+                ...(currentMode === 'dual' && {sensor2: data.sensor2})
+            });
+
+            updateChart(timestamp, data);
+        } catch (error) {
+            console.error('测量请求失败:', error);
+        }
+    }
+
+    // 修改后的数据导出
+    function exportData() {
+        const headers = ['时间戳', '轴向传感器'];
+        if(currentMode === 'dual') headers.push('镜像传感器');
+        
+        const csvContent = [
+            headers.join(','),
+            ...measurementData.map(item => {
+                const row = [item.timestamp.toISOString(), item.sensor1.value];
+                if(currentMode === 'dual') row.push(item.sensor2.value);
+                return row.join(',');
+            })
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `measurement_${new Date().toISOString()}.csv`;
+        link.click();
+    }
+
+    // 处理传感器数据
+    function processSensorData(sensorId, data) {
+        const element = document.getElementById(sensorId + 'Status');
+        if (!data.success) {
+            element.innerHTML = `${sensorId}：设备故障`;
+            element.classList.add('warning');
+        } else if (data.value === 0) {
+            element.innerHTML = `${sensorId}：超出测量范围`;
+            element.classList.add('warning');
+        } else {
+            element.innerHTML = `${sensorId}：${data.value.toFixed(4)} mm`;
+            element.classList.remove('warning');
+        }
+    }
+
+    function updateChart(timestamp, data) {
+        chart.data.datasets[0].data.push({
+            x: timestamp,
+            y: data.sensor1.value
+        });
+        chart.data.datasets[1].data.push({
+            x: timestamp,
+            y: data.sensor2.value
+        });
+        chart.update();
+    }
+
+    function clearData() {
+        measurementData = [];
+        chart.data.datasets.forEach(dataset => dataset.data = []);
+        chart.update();
+        document.querySelectorAll('.status').forEach(el => {
+            el.innerHTML = '';
+            el.classList.remove('warning');
+        });
+    }
+
+
+</script>
+</body>
+</html>

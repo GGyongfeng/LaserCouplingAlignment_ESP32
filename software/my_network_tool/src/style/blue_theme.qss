@@ -1,0 +1,128 @@
+/* 主窗口样式 */
+QMainWindow {
+    background-color: #1a237e;
+}
+
+/* 标签样式 */
+QLabel {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+QLabel#title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #82b1ff;
+    padding: 10px;
+}
+
+/* 按钮样式 */
+QPushButton {
+    background-color: #3d5afe;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+QPushButton:hover {
+    background-color: #536dfe;
+}
+
+QPushButton:pressed {
+    background-color: #304ffe;
+}
+
+QPushButton:disabled {
+    background-color: #7986cb;
+}
+
+/* 表格样式 */
+QTableWidget {
+    background-color: #283593;
+    color: #ffffff;
+    gridline-color: #3949ab;
+    border: 1px solid #3949ab;
+    border-radius: 4px;
+}
+
+QTableWidget::item {
+    padding: 5px;
+}
+
+QTableWidget::item:selected {
+    background-color: #3d5afe;
+}
+
+QHeaderView::section {
+    background-color: #1a237e;
+    color: #ffffff;
+    padding: 5px;
+    border: 1px solid #3949ab;
+}
+
+/* 进度条样式 */
+QProgressBar {
+    border: 1px solid #3949ab;
+    border-radius: 3px;
+    text-align: center;
+    background-color: #283593;
+}
+
+QProgressBar::chunk {
+    background-color: #3d5afe;
+    width: 10px;
+}
+
+/* 对话框和分组框样式 */
+QDialog, QGroupBox {
+    background-color: #283593;
+}
+
+QGroupBox {
+    border: 1px solid #3949ab;
+    border-radius: 4px;
+    margin-top: 1em;
+    padding-top: 10px;
+}
+
+QGroupBox::title {
+    color: #82b1ff;
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0 3px;
+}
+
+/* 下拉框样式 */
+QComboBox {
+    background-color: #283593;
+    color: #ffffff;
+    border: 1px solid #3949ab;
+    border-radius: 4px;
+    padding: 5px;
+    min-width: 100px;
+}
+
+QComboBox::drop-down {
+    border: none;
+}
+
+QComboBox::down-arrow {
+    image: url(down_arrow.png);
+    width: 12px;
+    height: 12px;
+}
+
+QComboBox:on {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #3949ab;
+    background-color: #283593;
+    color: #ffffff;
+    selection-background-color: #3d5afe;
+} 
